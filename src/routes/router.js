@@ -1,5 +1,3 @@
-// import Vue from "vue";
-// import VueRouter from "vue-router";
 import {createWebHistory, createRouter} from "vue-router";
 
 import ProductList from "../pages/product/ProductList"
@@ -10,8 +8,6 @@ import CategoryList from "../pages/category/CategoryList";
 import CategoryAdd from "../pages/category/CategoryAdd";
 import CategoryEdit from "../pages/category/CategoryEdit";
 import HelloWorld from "@/components/HelloWorld";
-
-// Vue.use(VueRouter);
 
 const routes = [
     {
@@ -56,7 +52,6 @@ const routes = [
     }
 ];
 
-// const router = new VueRouter({ mode: 'history', routes: routes });
 const router = createRouter({
     history: createWebHistory(),
     routes: routes

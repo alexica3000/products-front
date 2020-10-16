@@ -91,7 +91,7 @@
                 await CategoryDataService.delete(id)
                     .then(r => {
                         const index = this.categories.findIndex(v => v.id === r.data.id);
-                        if (index > -1) this.$delete(this.categories, index);
+                        if (index > -1) this.categories.splice(index, 1);
                     }).catch(e => {
                       console.log(e.response.data);
                     });

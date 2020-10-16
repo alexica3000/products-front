@@ -15,16 +15,32 @@
                             v-model="category.title"
                         >
                         <small class="invalid-feedback d-block" >{{ titleErrMessage }}</small>
-                        <small id="emailHelp" class="form-text text-muted">Short name of the category</small>
+                        <small class="form-text text-muted">Short name of the category</small>
                     </div>
 
+                    <select class="form-control" @change="selectCategory">
+                      <option value="">Select parent category</option>
+                      <option
+                          v-for="cat in categories"
+                          :key="cat.id"
+                          :value="cat.id"
+                      >{{ cat.title }} id: {{ cat.id }}</option>
+                    </select>
+                    <small class="form-text text-muted">Select parent category</small>
+
                     <button
+                        type="button"
                         class="btn btn-primary"
                         @click="updateCategory"
                         :disabled="!disabled"
                     >Update</button>
 
-                    <a class="btn btn-dark" @click="cancel">Cancel</a>
+                    <button
+                        type="button"
+                        class="btn btn-dark"
+                        @click="goToCategoriesPage"
+                    >Cancel</button>
+
                 </form>
             </div>
         </div>
@@ -38,15 +54,17 @@
         data() {
             return {
                 category: {
-                    id: '',
-                    title: '',
+                  id: '',
+                  title: '',
+                  p_id: ''
                 },
                 titleErrMessage: '',
-                disabledButton: false
+                disabledButton: false,
+                categories: []
             }
         },
         methods: {
-            async  loadCategoryInfo() {
+            async loadCategoryInfo() {
                 await CategoryDataService.get(this.$route.params.id)
                     .then(r => {
                         this.category = r.data.data;
@@ -54,14 +72,11 @@
                         console.log(e.response.data);
                     });
             },
-            updateCategory(e) {
-                e.preventDefault();
-                let data = {title: this.category.title}
-
-                CategoryDataService.update(this.$route.params.id, data)
+            async updateCategory() {
+                await CategoryDataService.update(this.$route.params.id, this.category)
                     .then(r => {
                       if(r.data) {
-                        this.$router.push({name: 'CategoryList'});
+                        this.goToCategoriesPage();
                       }
                     }).catch(e => {
                         if(e.response.data.message && e.response.data.errors) {
@@ -70,8 +85,21 @@
                         }
                     });
             },
-            cancel() {
-                this.$router.push({name: 'CategoryList'})
+            async loadCategories() {
+              await CategoryDataService.getAll()
+                  .then(r => {
+                    this.categories = r.data.data;
+                  }).catch(e => {
+                    console.log(e.response.data);
+                  })
+            },
+            goToCategoriesPage() {
+              !this.fromRoute || !this.fromRoute.name || !this.fromRoute.params
+                  ? this.$router.push({name: 'CategoryList'})
+                  : this.$router.push({name: this.fromRoute.name, params: this.fromRoute.params});
+            },
+            selectCategory(e) {
+              this.category.p_id = e.target.value;
             }
         },
         computed: {
@@ -81,6 +109,12 @@
         },
         mounted() {
             this.loadCategoryInfo();
+            this.loadCategories();
+        },
+        beforeRouteEnter (to, from, next) {
+          next(vm => {
+            vm.fromRoute = from;
+          })
         }
     }
 </script>

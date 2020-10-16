@@ -39,12 +39,14 @@
                             <td>{{ product.description }}</td>
                             <td>{{ product.price }}</td>
                             <td>
-                                <div
+                              <ul>
+                                <li
                                     v-for="category in product.categories"
                                     :key="category.id"
                                 >
-                                    {{ category.title }} (id: {{ category.id }})
-                                </div>
+                                  {{ category.title }} (id: {{ category.id }})
+                                </li>
+                              </ul>
                             </td>
                             <td>
                                 <router-link :to="{name: 'ProductEdit', params: {id: product.id}}">
@@ -95,7 +97,7 @@
                 await ProductDataService.delete(id)
                     .then(r => {
                         const index = this.products.findIndex(v => v.id === r.data.id);
-                        if (index > -1) this.$delete(this.products, index);
+                      if (index > -1) this.products.splice(index, 1);
                     }).catch(e => {
                         console.log(e.response);
                     });

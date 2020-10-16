@@ -17,15 +17,24 @@
                         <small class="form-text text-muted">Short name of the category</small>
                     </div>
 
-                    <select class="form-control" @change="selectCategory">
+                    <select class="form-control" @change="selectCategory" v-if="!loadParentCategory">
                         <option value="">Select parent category</option>
                         <option
                             v-for="cat in categories"
                             :key="cat.id"
                             :value="cat.id"
-                        >{{ cat.title }} - id: {{ cat.id }}</option>
+                        >{{ cat.title }} id: {{ cat.id }}</option>
                     </select>
-                    <small class="form-text text-muted">Select parent category</small>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        :value="parentCategory.title"
+                        disabled
+                        v-if="loadParentCategory"
+                    >
+
+                    <small class="form-text text-muted">Parent category</small>
 
                     <button
                         type="button"
@@ -56,7 +65,13 @@
                     title: '',
                     p_id: null
                 },
-                categories: []
+                parentCategory: {
+                  id: '',
+                  title: '',
+                  p_id: ''
+                },
+                categories: [],
+                loadParentCategory: false
             }
         },
         methods: {
@@ -78,6 +93,18 @@
                         console.log(e.response.data);
                     })
             },
+            async getCategory(id) {
+                await CategoryDataService.get(id)
+                  .then(r => {
+                      if(r.data) {
+                        this.parentCategory = r.data.data;
+                        this.category.p_id = this.parentCategory.id;
+                        this.loadParentCategory = true;
+                      }
+                  }).catch(e => {
+                      console.log(e.response.data);
+                  });
+            },
             goToCategoriesPage() {
                 !this.fromRoute || !this.fromRoute.name || !this.fromRoute.params
                     ? this.$router.push({name: 'CategoryList'})
@@ -85,6 +112,11 @@
             },
             selectCategory(e) {
                 this.category.p_id = e.target.value;
+            },
+            checkIsParentCategory() {
+              if(this.fromRoute.params.category_id) {
+                this.getCategory(this.fromRoute.params.category_id);
+              }
             }
         },
         computed: {
@@ -94,6 +126,7 @@
         },
         mounted() {
             this.loadCategories();
+            this.checkIsParentCategory();
         },
         beforeRouteEnter (to, from, next) {
             next(vm => {
