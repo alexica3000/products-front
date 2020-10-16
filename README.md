@@ -1,7 +1,7 @@
 ## products-front
 
 Front app for products catalog (api, Vue.js)
-
+ 
 #### Project setup
 ```
 npm install
