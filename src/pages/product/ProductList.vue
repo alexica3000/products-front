@@ -72,26 +72,33 @@
 
 <script>
     import ProductDataService from "../../routes/services/ProductDataService";
+    import CategoryDataService from "@/routes/services/CategoryDataService";
 
     export default {
         data() {
             return {
                 loadingComponent: false,
-                products: []
+                products: [],
+                category: {
+                  title: '',
+                  id: ''
+                },
+                fromRoute: null
             }
         },
         methods: {
             async retrieveProducts() {
                 this.loadingComponent = true;
-
-                await ProductDataService.getAll()
-                    .then(r => {
-                        this.products = r.data.data;
-                    }).catch(e => {
-                        console.log(e.response.data);
-                    }).finally(() => {
-                        this.loadingComponent = false;
-                    });
+                // let category_id = this.category.id ? this.category.id : null;
+              // console.log(category_id);
+                // await ProductDataService.getAll(category_id)
+                //     .then(r => {
+                //         this.products = r.data.data;
+                //     }).catch(e => {
+                //         console.log(e.response.data);
+                //     }).finally(() => {
+                //         this.loadingComponent = false;
+                //     });
             },
             async deleteProduct(e, id) {
                 await ProductDataService.delete(id)
@@ -101,11 +108,31 @@
                     }).catch(e => {
                         console.log(e.response);
                     });
+            },
+            async getCategory() {
+              console.log(this.fromRoute.params);
+              if(!this.fromRoute || !this.fromRoute.name || !this.fromRoute.params) return;
+
+                await CategoryDataService.get(this.fromRoute.params.category_id)
+                    .then(r => {
+                        if(r.data) {
+                            this.category = r.data.data;
+                            // console.log(this.category);
+                        }
+                    }).catch(e => {
+                        console.log(e.response.data);
+                    })
             }
         },
         mounted(){
+            this.getCategory();
             this.retrieveProducts();
         },
+        beforeRouteEnter (to, from, next) {
+          next(vm => {
+            vm.fromRoute = from;
+          })
+        }
     }
 </script>
 

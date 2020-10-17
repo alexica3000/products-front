@@ -1,11 +1,11 @@
 import Http from '../http-common'
 
-let routeLink  = 'products';
+let routeLink  = '/products';
 
 class ProductDataService {
 
-    getAll() {
-        return Http.get(`${routeLink}`);
+    getAll(category_id = null) {
+        return Http.get(`${routeLink}`, {params: {category_id: category_id}});
     }
 
     create(data) {

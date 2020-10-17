@@ -9,6 +9,7 @@
                         <h5><span v-if="currentCategory.title">{{ currentCategory.title }}</span></h5>
                     </div>
                     <div class="col text-right">
+                        <router-link class="btn btn-primary" :to="{name: 'ProductAdd'}" v-if="currentCategory.id">Add product</router-link>
                         <router-link class="btn btn-primary" :to="{name: 'CategoryAdd'}">New category</router-link>
                     </div>
                 </div>
@@ -20,8 +21,9 @@
                     <thead>
                         <tr>
                             <th scope="col">ID</th>
-                            <th scope="col" style="width:50%">Category</th>
+                            <th scope="col">Category</th>
                             <th scope="col">Subcategories</th>
+                            <th scope="col">Products</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
@@ -34,10 +36,17 @@
                             <th>{{ category.id }}</th>
                             <td>{{ category.title }}</td>
                             <td>
-                                <div v-if="checkIsSubcategories(category.count_subcategories)">
+                                <div v-if="category.count_subcategories">
                                     <router-link
                                         :to="{name: 'CategoryList', params: {category_id: category.id}}"
                                     >{{ category.count_subcategories }}</router-link>
+                                </div>
+                            </td>
+                            <td>
+                                <div v-if="category.count_products">
+                                    <router-link
+                                        :to="{name: 'ProductList', params: {category_id: 33333}}"
+                                    >{{ category.count_products }}</router-link>
                                 </div>
                             </td>
                             <td>
@@ -72,7 +81,8 @@
                 category_id: null,
                 categories: [],
                 currentCategory: {
-                    title: ''
+                    title: '',
+                    id: ''
                 }
             }
         },
@@ -98,6 +108,7 @@
             },
             async getCurrentCategory() {
                 this.currentCategory.title = '';
+                this.currentCategory.id = '';
                 if(!this.$route.params.category_id) return;
 
                 await CategoryDataService.get(this.$route.params.category_id)
@@ -106,9 +117,6 @@
                     }).catch(e => {
                         console.log(e.response.data);
                     });
-            },
-            checkIsSubcategories(count_subcategories) {
-                return count_subcategories > 0;
             }
         },
         mounted(){

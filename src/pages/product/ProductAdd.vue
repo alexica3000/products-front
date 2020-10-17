@@ -7,16 +7,16 @@
                 <form>
                     <div class="form-group">
                         <input type="text" class="form-control" id="product" name="product" placeholder="Enter product" v-model="product.title">
-                        <small id="nameHelp" class="form-text text-muted">Short name of the product</small>
+                        <small class="form-text text-muted">Short name of the product</small>
 
                         <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter description" v-model="product.description"></textarea>
-                        <small id="descriptionHelp" class="form-text text-muted">Short description</small>
+                        <small class="form-text text-muted">Short description</small>
 
                         <input type="number" class="form-control" id="price" name="price" placeholder="Enter price" v-model="product.price">
-                        <small id="priceHelp" class="form-text text-muted">Price of the product</small>
+                        <small class="form-text text-muted">Price of the product</small>
                     </div>
 
-                    <div>
+                    <div v-if="!loadedCategory">
                         <h4>Select categories:</h4>
                         <ul>
                             <li
@@ -36,6 +36,16 @@
                             </li>
                         </ul>
                     </div>
+                    <div v-if="loadedCategory">
+                      <input
+                          type="text"
+                          class="form-control"
+                          :value="category.title"
+                          disabled
+                      >
+                      <small class="form-text text-muted mb-3">Category of the product</small>
+                    </div>
+
                     <button
                         type="button"
                         class="btn btn-primary"
@@ -45,7 +55,7 @@
                     <button
                         type="button"
                         class="btn btn-dark"
-                        @click="cancel"
+                        @click="goToBackRoute"
                     >Cancel</button>
                 </form>
             </div>
@@ -67,7 +77,12 @@
                     categories_id: []
                 },
                 categories: [],
-                selectedCategoriesId: []
+                selectedCategoriesId: [],
+                category: {
+                    title: '',
+                    id: ''
+                },
+                loadedCategory: false
             }
         },
         methods: {
@@ -77,7 +92,7 @@
                 await ProductDataService.create(this.product)
                     .then(r => {
                       if(r.data) {
-                        this.$router.push({name: 'ProductList'});
+                        this.goToBackRoute();
                       }
                     }).catch(e => {
                         console.log(e.response.data);
@@ -91,8 +106,27 @@
                         console.log(e.response.data);
                     });
             },
-            cancel() {
-                this.$router.push({name: 'ProductList'})
+            async getCategory(id) {
+              await CategoryDataService.get(id)
+                  .then(r => {
+                    if(r.data) {
+                      this.category = r.data.data;
+                      this.selectedCategoriesId = [this.category.id];
+                      this.loadedCategory = true;
+                    }
+                  }).catch(e => {
+                    console.log(e.response.data);
+                  });
+            },
+            goToBackRoute() {
+              !this.fromRoute || !this.fromRoute.name || !this.fromRoute.params
+                  ? this.$router.push({name: 'ProductList'})
+                  : this.$router.push({name: this.fromRoute.name, params: this.fromRoute.params});
+            },
+            getParentCategoryIfExist() {
+              if(this.fromRoute.params.category_id) {
+                this.getCategory(this.fromRoute.params.category_id);
+              }
             }
         },
         computed: {
@@ -104,6 +138,12 @@
         },
         mounted() {
             this.loadCategoriesInfo();
+            this.getParentCategoryIfExist();
+        },
+        beforeRouteEnter (to, from, next) {
+          next(vm => {
+            vm.fromRoute = from;
+          })
         }
     }
 </script>
