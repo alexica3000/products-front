@@ -8,7 +8,7 @@
                     </div>
 
                     <div class="col text-right">
-                        <router-link class="btn btn-primary" :to="{name: 'ProductAdd'}">New product</router-link>
+                        <router-link class="btn btn-primary" :to="{name: 'ProductAdd', params: {from_category_id: from_category_id}}">New product</router-link>
                     </div>
                 </div>
             </div>

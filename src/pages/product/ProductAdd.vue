@@ -127,6 +127,10 @@
               if(this.fromRoute.params.category_id) {
                 this.getCategory(this.fromRoute.params.category_id);
               }
+
+              if(this.from_category_id) {
+                this.getCategory(this.from_category_id);
+              }
             }
         },
         computed: {
@@ -144,7 +148,8 @@
           next(vm => {
             vm.fromRoute = from;
           })
-        }
+        },
+        props: ['from_category_id']
     }
 </script>
 

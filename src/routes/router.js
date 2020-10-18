@@ -29,7 +29,8 @@ const routes = [
     {
         name: 'ProductAdd',
         path: '/products/add',
-        component: ProductAdd
+        component: ProductAdd,
+        props: true
     },
     {
         name: 'ProductEdit',
