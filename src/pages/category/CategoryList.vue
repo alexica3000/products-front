@@ -45,7 +45,7 @@
                             <td>
                                 <div v-if="category.count_products">
                                     <router-link
-                                        :to="{name: 'ProductList', params: {category_id: 33333}}"
+                                        :to="{name: 'ProductList', params: {from_category_id: category.id}}"
                                     >{{ category.count_products }}</router-link>
                                 </div>
                             </td>

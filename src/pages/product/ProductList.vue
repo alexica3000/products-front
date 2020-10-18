@@ -4,6 +4,7 @@
                 <div class="row">
                     <div class="col">
                         <h3>Products</h3>
+                        <h5 v-if="category.title">Category: {{ category.title }}</h5>
                     </div>
 
                     <div class="col text-right">
@@ -81,7 +82,7 @@
                 products: [],
                 category: {
                   title: '',
-                  id: ''
+                  id: null
                 },
                 fromRoute: null
             }
@@ -89,16 +90,15 @@
         methods: {
             async retrieveProducts() {
                 this.loadingComponent = true;
-                // let category_id = this.category.id ? this.category.id : null;
-              // console.log(category_id);
-                // await ProductDataService.getAll(category_id)
-                //     .then(r => {
-                //         this.products = r.data.data;
-                //     }).catch(e => {
-                //         console.log(e.response.data);
-                //     }).finally(() => {
-                //         this.loadingComponent = false;
-                //     });
+
+                await ProductDataService.getAll(this.from_category_id)
+                    .then(r => {
+                        this.products = r.data.data;
+                    }).catch(e => {
+                        console.log(e.response.data);
+                    }).finally(() => {
+                        this.loadingComponent = false;
+                    });
             },
             async deleteProduct(e, id) {
                 await ProductDataService.delete(id)
@@ -110,14 +110,12 @@
                     });
             },
             async getCategory() {
-              console.log(this.fromRoute.params);
-              if(!this.fromRoute || !this.fromRoute.name || !this.fromRoute.params) return;
+                if(!this.from_category_id) return;
 
-                await CategoryDataService.get(this.fromRoute.params.category_id)
+                await CategoryDataService.get(this.from_category_id)
                     .then(r => {
                         if(r.data) {
                             this.category = r.data.data;
-                            // console.log(this.category);
                         }
                     }).catch(e => {
                         console.log(e.response.data);
@@ -128,6 +126,7 @@
             this.getCategory();
             this.retrieveProducts();
         },
+        props: ['from_category_id'],
         beforeRouteEnter (to, from, next) {
           next(vm => {
             vm.fromRoute = from;

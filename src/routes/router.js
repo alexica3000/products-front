@@ -23,7 +23,8 @@ const routes = [
     {
         name: 'ProductList',
         path: '/products',
-        component: ProductList
+        component: ProductList,
+        props: true
     },
     {
         name: 'ProductAdd',
